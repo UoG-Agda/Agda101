@@ -45,14 +45,20 @@ half n = {!!}
 _ : ℕ
 _ = half 8 {!!}
 
--- Introduce type parameters
 
-data List (A : Set) : Set where
-  []  : List A
-  _∷_ : A → List A → List A
+-- Briefly introduce modules
+module List where
 
-_++_ : {A : Set} → List A → List A → List A
-xs ++ ys = {!!}
+  -- Introduce type parameters
+  data List (A : Set) : Set where
+    []  : List A
+    _∷_ : A → List A → List A
+
+  _++_ : {A : Set} → List A → List A → List A
+  xs ++ ys = {!!}
+
+  map : {A B : Set} → (A → B) → List A → List B
+  map f xs = {!!}
 
 -- Comment on termination checking
 
@@ -61,15 +67,24 @@ brexit = brexit
 
 -- Introduce type families
 
-data Vec (A : Set) : ℕ → Set where
-  []  : Vec A 0
-  -- Introduce foralls
-  _∷_ : ∀ {n} → A → Vec A n → Vec A (suc n)
+module Vec where
+  data Vec (A : Set) : ℕ → Set where
+    []  : Vec A 0
+    -- Introduce foralls
+    _∷_ : ∀ {n} → A → Vec A n → Vec A (suc n)
 
-zipWith : ∀ {A B C : Set} {n} (f : A → B → C)
-        → Vec A n → Vec B n → Vec C n
-zipWith f xs ys = {!!}
+  head : ∀ {A : Set} {n} → Vec A (suc n) → A
+  head xs = {!!}
 
+  _++_ : ∀ {A : Set} {n m} → Vec A n → Vec A m → Vec A (n + m)
+  xs ++ ys = {!!}
+
+  map : ∀ {A B : Set} {n} → (A → B) → Vec A n → Vec B n
+  map f xs = {!!}
+
+  zipWith : ∀ {A B C : Set} {n} (f : A → B → C)
+          → Vec A n → Vec B n → Vec C n
+  zipWith f xs ys = {!!}
 
 -- For next time
 
