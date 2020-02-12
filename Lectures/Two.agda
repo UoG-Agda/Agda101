@@ -3,6 +3,7 @@ module Lectures.Two where
 -- Introduce imports
 open import Lectures.One
 
+
 -- Introduce type parameters
 
 module List-types where
@@ -14,47 +15,74 @@ module List-types where
   _ : List Set
   _ = ⊥ ∷ (ℕ ∷ (⊤ ∷ []))
 
-module List where
+module List {ℓ} where
 
-  data List (A : Set) : Set where
+  data List (A : Set ℓ) : Set ℓ where
     [] : List A
     _∷_ : A → List A → List A
 
-  _ : List ℕ
-  _ = 0 ∷ (1 ∷ (2 ∷ []))
+  _++_ : {A : Set ℓ} → List A → List A → List A
+  [] ++ ys = ys
+  (x ∷ xs) ++ ys = x ∷ (xs ++ ys)
 
-  _++_ : {A : Set} → List A → List A → List A
-  xs ++ ys = {!!}
+  map : {A B : Set ℓ} → (A → B) → List A → List B
+  map f [] = []
+  map f (x ∷ xs) = f x ∷ map f xs
 
-  map : {A B : Set} → (A → B) → List A → List B
-  map f xs = {!!}
+open List using (List; []; _∷_)
+
+_ : List ℕ
+_ = 0 ∷ (1 ∷ (2 ∷ []))
 
 -- Introduce type families
 
 module Vec where
   data Vec (A : Set) : ℕ → Set where
-    []  : Vec A 0
+    []  : Vec A zero
     _∷_ : ∀ {n} → A → Vec A n → Vec A (suc n)
 
-  head : ∀ {A : Set} {n} → Vec A (suc n) → A
-  head xs = {!!}
+  head : ∀ {A n} → Vec A (suc n) → A
+  head (x ∷ xs) = x
 
-  _++_ : ∀ {A : Set} {n m} → Vec A n → Vec A m → Vec A (n + m)
-  xs ++ ys = {!!}
+  _++_ : ∀ {A n m} → Vec A n → Vec A m → Vec A (n + m)
+  [] ++ ys = ys
+  (x ∷ xs) ++ ys = x ∷ (xs ++ ys)
 
-  map : ∀ {A B : Set} {n} → (A → B) → Vec A n → Vec B n
-  map f xs = {!!}
+  map : ∀ {A B n} → (A → B) → Vec A n → Vec B n
+  map f [] = []
+  map f (x ∷ xs) = f x ∷ map f xs
 
   zipWith : ∀ {A B C : Set} {n} (f : A → B → C)
           → Vec A n → Vec B n → Vec C n
-  zipWith f xs ys = {!!}
+  zipWith f [] [] = []
+  zipWith f (x ∷ xs) (y ∷ ys) = f x y ∷ zipWith f xs ys
 
--- For next time
+--  \u+
+data _⊎_ (A : Set) (B : Set) : Set where
+  inj₁ : A → A ⊎ B
+  inj₂ : B → A ⊎ B
 
--- Records
--- Σ & ⊎ (no lem, lem irrefutable, decidability)
--- Propositional hom equality
--- ≡-trans, ≡-sym, ≡-cong
--- Lists of units and nats are isomorphic
--- Fin
--- Constructive leq
+Dec : Set → Set
+Dec B = B ⊎ (¬ B)
+
+data _×'_ (A : Set) (B : Set) : Set where
+  _,'_ : A → B → A ×' B
+
+record _×''_ (A : Set) (B : Set) : Set where
+  constructor _,''_
+  field
+    proj₁ : A
+    proj₂ : B
+
+-- \Sigma
+record Σ {ℓ} (A : Set ℓ) (B : A → Set ℓ) : Set ℓ where
+  constructor _,_
+  field
+    proj₁ : A
+    proj₂ : B proj₁
+
+_ : Σ ℕ _isEven
+_ = 0 , tt
+
+_×_ : Set → Set → Set
+A × B = Σ A λ _ → B
