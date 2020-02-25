@@ -65,14 +65,15 @@ data _⊎_ (A : Set) (B : Set) : Set where
 Dec : Set → Set
 Dec B = B ⊎ (¬ B)
 
-data _×'_ (A : Set) (B : Set) : Set where
-  _,'_ : A → B → A ×' B
+private
+  data _×'_ (A : Set) (B : Set) : Set where
+    _,'_ : A → B → A ×' B
 
-record _×''_ (A : Set) (B : Set) : Set where
-  constructor _,''_
-  field
-    proj₁ : A
-    proj₂ : B
+  record _×''_ (A : Set) (B : Set) : Set where
+    constructor _,''_
+    field
+      proj₁ : A
+      proj₂ : B
 
 -- \Sigma
 record Σ {ℓ} (A : Set ℓ) (B : A → Set ℓ) : Set ℓ where
@@ -80,6 +81,8 @@ record Σ {ℓ} (A : Set ℓ) (B : A → Set ℓ) : Set ℓ where
   field
     proj₁ : A
     proj₂ : B proj₁
+
+open Σ public
 
 _ : Σ ℕ _isEven
 _ = 0 , tt
