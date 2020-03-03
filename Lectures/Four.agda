@@ -30,18 +30,51 @@ foldr-ℕ f z (suc n) = f (foldr-ℕ f z n)
   where
 
   to : ℕ → List ⊤
-  from : List ⊤ → ℕ -- use a lambda
-  from∘to : ∀ x → (from ∘ to) x ≡ x -- by cong
-  to∘from : ∀ x → (to ∘ from) x ≡ x -- by cong, importance of pattern matching on x ↦ tt
+  to = foldr-ℕ (tt ∷_) []
+
+  from : List ⊤ → ℕ
+  from = foldr-List (λ _ → suc) 0
+
+  from∘to : ∀ x → (from ∘ to) x ≡ x
+  from∘to zero = refl
+  from∘to (suc x) = cong suc (from∘to x)
+
+  to∘from : ∀ x → (to ∘ from) x ≡ x
+  to∘from [] = refl
+  to∘from (tt ∷ xs) = cong (tt ∷_) (to∘from xs)
 
 ℕ↔Even : ℕ ↔ Σ ℕ _isEven
 ℕ↔Even = Isomorphism to from from∘to to∘from
   where
 
-  to : ℕ → Σ ℕ _isEven -- with with
-  from : (Σ ℕ _isEven) → ℕ -- lambda pattern match
-  from∘to : ∀ x → (from ∘ to) x ≡ x -- introduce rewrite
-  to∘from : ∀ x → (to ∘ from) x ≡ x -- comment on equality on record types
+  to : ℕ → Σ ℕ _isEven
+  to zero = zero , tt
+  to (suc n) with to n
+  to (suc n) | (2n , 2nEven) = (suc (suc 2n) , 2nEven)
+
+  from : (Σ ℕ _isEven) → ℕ
+  from (n , nEven) = half n nEven
+
+  from∘to : ∀ x → (from ∘ to) x ≡ x
+  from∘to zero = refl
+  from∘to (suc n) with to n | from∘to n
+  from∘to (suc .(half (proj₁ q) (proj₂ q))) | q | refl = refl
+
+  to∘from : ∀ x → (to ∘ from) x ≡ x
+  to∘from (zero , tt) = refl
+  to∘from (suc (suc n) , nEven) rewrite to∘from (n , nEven) = refl
+
+data Fin : ℕ → Set where
+  zero : ∀ {n} → Fin (suc n)
+  suc : ∀ {n} → Fin n → Fin (suc n)
+
+noFin0 : Fin 0 → ⊥
+noFin0 ()
+
+open Vec
+lookup : ∀ {n} {A : Set} → Vec A n → Fin n → A
+lookup (x ∷ xs) zero = x
+lookup (x ∷ xs) (suc i) = lookup xs i
 
 -- For next time:
 -- Fin
