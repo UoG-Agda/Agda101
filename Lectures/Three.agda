@@ -62,3 +62,6 @@ postulate
 +-comm zero y = +-idʳ _
 +-comm (suc x) y = trans (cong suc (+-comm x y)) (+-suc _ _)
 
++-assoc : ∀ x y z → x + (y + z) ≡ (x + y) + z
++-assoc zero y z = refl
++-assoc (suc x) y z = cong suc (+-assoc x y z)
